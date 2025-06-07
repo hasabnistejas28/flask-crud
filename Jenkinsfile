@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS_ID = 'docker-hub-credentials'
-        DOCKER_HUB_USERNAME = 'hasabnistejas' // Use your actual Docker Hub username
+        DOCKER_HUB_USERNAME = 'hasabnistejas' // Make sure this is your Docker Hub username
     }
 
     stages {
-        stage('1. Build Backend Docker Image') { // Renamed from stage 2 to 1
+        stage('1. Build Backend Docker Image') {
             steps {
                 script {
                     sh 'docker build -t ${DOCKER_HUB_USERNAME}/s3-backend:latest ./backend'
@@ -15,7 +15,7 @@ pipeline {
             }
         }
         
-        stage('2. Push to Docker Hub') { // Renamed from stage 3 to 2
+        stage('2. Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDS_ID, passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USER')]) {
                     sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
@@ -38,13 +38,15 @@ pipeline {
                         sh 'docker-compose up --build -d'
                         echo "Deployment complete!"
                     }
-                }
+                } // This closing brace for withCredentials might have been missed
             }
-        }
+        } // This closing brace for the stage might have been missed
+    } // This closing brace for stages might have been missed
+
     post {
         always {
             cleanWs()
             sh 'docker logout'
         }
     }
-}
+} // This is the final closing brace for the pipeline
