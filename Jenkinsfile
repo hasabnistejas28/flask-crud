@@ -24,17 +24,23 @@ pipeline {
             }
         }
 
-        stage('3. Deploy to EC2') { // Renamed from stage 4 to 3
+        stage('3. Deploy to EC2') {
             steps {
-                script {
-                    echo "Deploying the application using Docker Compose..."
-                    sh 'docker-compose down'
-                    sh 'docker-compose up --build -d'
-                    echo "Deployment complete!"
+                // Use the 'aws-env-file' credential
+                withCredentials([string(credentialsId: 'aws-env-file', variable: 'DOT_ENV_CONTENT')]) {
+                    script {
+                        echo "Deploying the application using Docker Compose..."
+                        // Create the .env file in the workspace from the secret text
+                        sh 'echo "$DOT_ENV_CONTENT" > .env'
+                        
+                        // Now run the docker-compose commands
+                        sh 'docker-compose down'
+                        sh 'docker-compose up --build -d'
+                        echo "Deployment complete!"
+                    }
                 }
             }
         }
-    }
     post {
         always {
             cleanWs()
