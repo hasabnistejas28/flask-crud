@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDS_ID = 'docker-hub-credentials'
-        DOCKER_HUB_USERNAME = 'hasabnistejas' // Make sure this is your Docker Hub username
+        DOCKER_HUB_USERNAME = 'hasabnistejas' // Corrected Docker Hub username
     }
 
     stages {
@@ -33,15 +33,15 @@ pipeline {
                         // Create the .env file in the workspace from the secret text
                         sh 'echo "$DOT_ENV_CONTENT" > .env'
                         
-                        // Now run the docker-compose commands
-                        sh 'docker-compose down'
-                        sh 'docker-compose up --build -d'
+                        // Now run the correct docker compose commands (with a space)
+                        sh 'docker compose down'
+                        sh 'docker compose up --build -d'
                         echo "Deployment complete!"
                     }
-                } // This closing brace for withCredentials might have been missed
+                }
             }
-        } // This closing brace for the stage might have been missed
-    } // This closing brace for stages might have been missed
+        }
+    }
 
     post {
         always {
@@ -49,4 +49,4 @@ pipeline {
             sh 'docker logout'
         }
     }
-} // This is the final closing brace for the pipeline
+}
